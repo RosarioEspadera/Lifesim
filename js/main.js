@@ -1,5 +1,12 @@
 "use strict";
 
+let player = {
+  name: "",
+  age: 0,
+  stats: {}
+};
+
+
 let characters = [];
 
 class Person {
