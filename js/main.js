@@ -45,6 +45,8 @@ class Person {
         this.career = {};
         this.currentCareer = { studying: false };
 
+        this.education = "None"; // NEW field for NPC/player education
+
         this.alive = true;
         this.characterIndex = characters.length;
 
@@ -122,6 +124,34 @@ function initActions() {
     };
 }
 
+/* ----------------- Education System ----------------- */
+
+function assignNPCEducation(characters) {
+    characters.forEach(c => {
+        if (!c.education || c.education === "None") {
+            if (c.age < 6) {
+                c.education = "Too young for school";
+            } else if (c.age < 12) {
+                c.education = "Primary School";
+            } else if (c.age < 18) {
+                c.education = "High School";
+            } else if (c.age < 22) {
+                c.education = Math.random() < 0.6 ? "College Student" : "High School Graduate";
+            } else {
+                // Adults: some will go to college, others won't
+                const roll = Math.random();
+                if (roll < 0.3) {
+                    c.education = "College Graduate";
+                } else if (roll < 0.6) {
+                    c.education = "Some College";
+                } else {
+                    c.education = "High School Graduate";
+                }
+            }
+        }
+    });
+}
+
 /* ----------------- UI ----------------- */
 
 function interfaceLoading() {
@@ -130,17 +160,14 @@ function interfaceLoading() {
     document.querySelector("main").style.display = "block";
     document.getElementById("navbar").style.display = "flex";
 
-    // Reset tale text ✅ fixed birthplace + nationality
+    // Reset tale text
     const textContainer = document.getElementById("text-container");
-    textContainer.innerHTML = `<p>You were born in ${player.birthplace}, ${player.nationality}.</p>`;
+    textContainer.innerHTML = `<p>You were born in ${player.birthplace}.</p>`;
 
     // Update stat bars with player data
     updateStatsUI();
 }
 
-/**
- * Updates the progress bars (health, happiness, etc.) from player stats.
- */
 function updateStatsUI() {
     if (!player || !player.stats) return;
 
@@ -150,7 +177,7 @@ function updateStatsUI() {
     document.getElementById("appearance-bar").style.width = player.stats.appearance + "%";
     document.getElementById("fitness-bar").style.width = player.stats.fitness + "%";
 
-    // ✅ fixed: money now uses .total
+    // Update money
     document.getElementById("total-money").innerText = player.money.total + " $";
 }
 
@@ -191,8 +218,8 @@ const randomCharacter = () => {
     player = new Person();
     characters.push(player);
     createFamily(player);
+    assignNPCEducation(characters); // <- now works
     interfaceLoading();
-    assignNPCEducation(characters);
 };
 
 const customCharacter = () => {
@@ -206,16 +233,6 @@ const customCharacter = () => {
     player = new Person({ name, surname, age, gender, nationality, money });
     characters.push(player);
     createFamily(player);
+    assignNPCEducation(characters); // <- now works
     interfaceLoading();
-    assignNPCEducation(characters);
 };
-
-/* ----------------- Age Button Hook ✅ ----------------- */
-
-// Example: if you have an "Age" button
-document.getElementById("age-button")?.addEventListener("click", () => {
-    if (!player) return;
-    player.age++;
-    // refresh stats when aging
-    updateStatsUI();
-});
