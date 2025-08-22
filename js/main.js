@@ -1,8 +1,6 @@
 "use strict";
 
 let player; 
-
-
 let characters = [];
 
 class Person {
@@ -124,6 +122,38 @@ function initActions() {
     };
 }
 
+/* ----------------- UI ----------------- */
+
+function interfaceLoading() {
+    // Show the main interface, hide the character creation screen
+    document.getElementById("create-character-screen").style.display = "none";
+    document.querySelector("main").style.display = "block";
+    document.getElementById("navbar").style.display = "flex";
+
+    // Reset tale text ✅ fixed birthplace + nationality
+    const textContainer = document.getElementById("text-container");
+    textContainer.innerHTML = `<p>You were born in ${player.birthplace}, ${player.nationality}.</p>`;
+
+    // Update stat bars with player data
+    updateStatsUI();
+}
+
+/**
+ * Updates the progress bars (health, happiness, etc.) from player stats.
+ */
+function updateStatsUI() {
+    if (!player || !player.stats) return;
+
+    document.getElementById("health-bar").style.width = player.stats.health + "%";
+    document.getElementById("happiness-bar").style.width = player.stats.happiness + "%";
+    document.getElementById("smartness-bar").style.width = player.stats.smartness + "%";
+    document.getElementById("appearance-bar").style.width = player.stats.appearance + "%";
+    document.getElementById("fitness-bar").style.width = player.stats.fitness + "%";
+
+    // ✅ fixed: money now uses .total
+    document.getElementById("total-money").innerText = player.money.total + " $";
+}
+
 /* ----------------- Family Creation ----------------- */
 
 const createFamily = (player) => {
@@ -179,3 +209,13 @@ const customCharacter = () => {
     interfaceLoading();
     assignNPCEducation(characters);
 };
+
+/* ----------------- Age Button Hook ✅ ----------------- */
+
+// Example: if you have an "Age" button
+document.getElementById("age-button")?.addEventListener("click", () => {
+    if (!player) return;
+    player.age++;
+    // refresh stats when aging
+    updateStatsUI();
+});
