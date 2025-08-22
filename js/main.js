@@ -1,10 +1,6 @@
 "use strict";
 
-let player = {
-  name: "",
-  age: 0,
-  stats: {}
-};
+let player; 
 
 
 let characters = [];
